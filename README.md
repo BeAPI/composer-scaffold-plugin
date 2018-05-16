@@ -18,7 +18,7 @@ Increase your workflow when creating a new plugin. By launching this composer co
 
 Then you can launch `composer scaffold-plugin <folder> [<components>]` :
 
-[List of arguments](screenshot.png)
+![List of arguments](screenshot.png)
 
 # Who ?
 
