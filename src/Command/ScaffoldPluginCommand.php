@@ -22,7 +22,7 @@ class ScaffoldPluginCommand extends BaseCommand {
 	);
 
 	protected function configure() {
-		$this->setName( 'scaffold-plugin' )->setDescription( 'Bootstrap a new WordPress plugin using BeAPI\'s boilerplate.' )->addArgument( 'folder', InputArgument::REQUIRED, "Your plugin's folder name" )->addArgument( 'components', InputArgument::IS_ARRAY, "Optional components you want to include in your plugin.\n Available components are :\n\t- Controller\n\t- Cron\n\t- Model\n\t- Route\n\t- Widget\n\t- Shortcode" );
+		$this->setName( 'scaffold-plugin' )->setDescription( 'Bootstrap a new WordPress plugin using Be API\'s boilerplate.' )->addArgument( 'folder', InputArgument::REQUIRED, "Your plugin's folder name" )->addArgument( 'components', InputArgument::IS_ARRAY, "Optional components you want to include in your plugin.\n Available components are :\n\t- Controller\n\t- Cron\n\t- Model\n\t- Route\n\t- Widget\n\t- Shortcode" );
 	}
 
 	protected function execute( InputInterface $input, OutputInterface $output ) {
@@ -162,11 +162,11 @@ class ScaffoldPluginCommand extends BaseCommand {
 		self::doStrReplace( $pluginCompletePath, 'BEA Plugin Name', $pluginRealName );
 
 		// namespace
-		$pluginNamespace = $this->askAndConfirm( $io, "What is your plugin's namespace ? (e.g: 'BEA\\My_Plugin') " );
+		$pluginNamespace = $this->askAndConfirm( $io, "What is your plugin's namespace ? (e.g: 'My_company\\My_Plugin') " );
 		self::doStrReplace( $pluginCompletePath, 'BEA\\PB', $pluginNamespace );
 
 		// constants prefix
-		$pluginConstsPrefix = $this->askAndConfirm( $io, "What is your constants prefix ? (e.g: 'MY_PLUGIN_') " );
+		$pluginConstsPrefix = $this->askAndConfirm( $io, "What is your constants prefix ? (e.g: 'MY_COMPANY_MY_PLUGIN_') " );
 		if ( '_' !== substr( $pluginConstsPrefix, - 1 ) ) {
 			$pluginConstsPrefix = $pluginConstsPrefix . '_';
 		}
