@@ -4,6 +4,8 @@
 
 External composer command to scaffold a plugin with the [BEA Plugin Boilerplate](https://github.com/BeAPI/bea-plugin-boilerplate).
 
+# What ?
+
 Increase your workflow when creating a new plugin. By launching this composer command, you will easily and quickly choose some components to add, or not, and bootstrap youe new plugin.
 
 # How ?
