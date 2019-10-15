@@ -1,6 +1,7 @@
 <?php namespace BEA\Composer\ScaffoldPlugin\Command;
 
 use Composer\Command\BaseCommand;
+use Composer\Composer;
 use Composer\Package\Package;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -8,6 +9,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 class ScaffoldPluginCommand extends BaseCommand {
+
+	const WP_PLUGIN_PACKAGE_TYPE = 'wordpress-plugin';
 
 	/**
 	 * @var array Additionnal components list.
@@ -66,9 +69,15 @@ class ScaffoldPluginCommand extends BaseCommand {
 		}
 
 		$downloadPath = $composer->getConfig()->get( 'vendor-dir' ) . '/boilerplate';
-		$pluginPath   = dirname( $composer->getConfig()->get( 'vendor-dir' ) ) . '/content/plugins';
 
-		if ( is_dir( $pluginPath . '/' . $pluginName ) ) {
+		try {
+			$installPath = $this->getInstallPath( $pluginName, $composer );
+		} catch ( \InvalidArgumentException $e ) {
+			$io->error( "Couldn't get WordPress plugins directory." );
+			exit;
+		}
+
+		if ( is_dir( $installPath ) ) {
 			$io->error( "A plugin with this folder's name already exist." );
 			exit;
 		}
@@ -83,24 +92,24 @@ class ScaffoldPluginCommand extends BaseCommand {
 			exit;
 		}
 
-		if ( ! mkdir( $pluginPath . '/' . $pluginName ) ) {
+		if ( ! mkdir( $installPath ) ) {
 			$io->error( "Couldn't create the plugin directory." );
 			exit;
 		}
 
 		// Basic plugin files
-		mkdir( $pluginPath . '/' . $pluginName . '/classes/admin/', 0755, true );
+		mkdir( $installPath . 'classes/admin/', 0755, true );
 
-		rename( $downloadPath . '/bea-plugin-boilerplate.php', $pluginPath . '/' . $pluginName . '/' . $pluginName . '.php' );
-		rename( $downloadPath . '/compat.php', $pluginPath . '/' . $pluginName . '/compat.php' );
-		rename( $downloadPath . '/autoload.php', $pluginPath . '/' . $pluginName . '/autoload.php' );
+		rename( $downloadPath . '/bea-plugin-boilerplate.php', $installPath . $pluginName . '.php' );
+		rename( $downloadPath . '/compat.php', $installPath . 'compat.php' );
+		rename( $downloadPath . '/autoload.php', $installPath . 'autoload.php' );
 
 		// Basic plugin classes
-		rename( $downloadPath . '/classes/plugin.php', $pluginPath . '/' . $pluginName . '/classes/plugin.php' );
-		rename( $downloadPath . '/classes/main.php', $pluginPath . '/' . $pluginName . '/classes/main.php' );
-		rename( $downloadPath . '/classes/helpers.php', $pluginPath . '/' . $pluginName . '/classes/helpers.php' );
-		rename( $downloadPath . '/classes/singleton.php', $pluginPath . '/' . $pluginName . '/classes/singleton.php' );
-		rename( $downloadPath . '/classes/admin/main.php', $pluginPath . '/' . $pluginName . '/classes/admin/main.php' );
+		rename( $downloadPath . '/classes/plugin.php', $installPath . 'classes/plugin.php' );
+		rename( $downloadPath . '/classes/main.php', $installPath . 'classes/main.php' );
+		rename( $downloadPath . '/classes/helpers.php', $installPath . 'classes/helpers.php' );
+		rename( $downloadPath . '/classes/singleton.php', $installPath . 'classes/singleton.php' );
+		rename( $downloadPath . '/classes/admin/main.php', $installPath . 'classes/admin/main.php' );
 
 		foreach ( $this->available_components as $component ) {
 			if ( ! in_array( $component, $components ) ) {
@@ -109,72 +118,68 @@ class ScaffoldPluginCommand extends BaseCommand {
 
 			switch ( $component ) {
 				case 'controller':
-					mkdir( $pluginPath . '/' . $pluginName . '/classes/controllers/' );
-					rename( $downloadPath . '/classes/controllers/controller.php', $pluginPath . '/' . $pluginName . '/classes/controllers/controller.php' );
+					mkdir( $installPath . 'classes/controllers/' );
+					rename( $downloadPath . '/classes/controllers/controller.php', $installPath . 'classes/controllers/controller.php' );
 					break;
 				case 'cron':
-					mkdir( $pluginPath . '/' . $pluginName . '/classes/cron/' );
-					rename( $downloadPath . '/classes/cron/cron.php', $pluginPath . '/' . $pluginName . '/classes/cron/cron.php' );
+					mkdir( $installPath . 'classes/cron/' );
+					rename( $downloadPath . '/classes/cron/cron.php', $installPath . 'classes/cron/cron.php' );
 					break;
 				case 'model':
-					mkdir( $pluginPath . '/' . $pluginName . '/classes/models/' );
-					rename( $downloadPath . '/classes/models/model.php', $pluginPath . '/' . $pluginName . '/classes/models/model.php' );
-					rename( $downloadPath . '/classes/models/user.php', $pluginPath . '/' . $pluginName . '/classes/models/user.php' );
+					mkdir( $installPath . 'classes/models/' );
+					rename( $downloadPath . '/classes/models/model.php', $installPath . 'classes/models/model.php' );
+					rename( $downloadPath . '/classes/models/user.php', $installPath . 'classes/models/user.php' );
 					break;
 				case 'route':
-					mkdir( $pluginPath . '/' . $pluginName . '/classes/routes/' );
-					rename( $downloadPath . '/classes/routes/router.php', $pluginPath . '/' . $pluginName . '/classes/routes/router.php' );
+					mkdir( $installPath . 'classes/routes/' );
+					rename( $downloadPath . '/classes/routes/router.php', $installPath . 'classes/routes/router.php' );
 					break;
 				case 'widget':
-					mkdir( $pluginPath . '/' . $pluginName . '/classes/widgets/' );
-					mkdir( $pluginPath . '/' . $pluginName . '/views/' );
-					mkdir( $pluginPath . '/' . $pluginName . '/views/admin/' );
-					mkdir( $pluginPath . '/' . $pluginName . '/views/client/' );
+					mkdir( $installPath . 'classes/widgets/' );
+					mkdir( $installPath . 'views/' );
+					mkdir( $installPath . 'views/admin/' );
+					mkdir( $installPath . 'views/client/' );
 
 					// Class
-					rename( $downloadPath . '/classes/widgets/main.php', $pluginPath . '/' . $pluginName . '/classes/widgets/main.php' );
+					rename( $downloadPath . '/classes/widgets/main.php', $installPath . 'classes/widgets/main.php' );
 
 					// Views
-					rename( $downloadPath . '/views/admin/widget.php', $pluginPath . '/' . $pluginName . '/views/admin/widget.php' );
-					rename( $downloadPath . '/views/client/widget.php', $pluginPath . '/' . $pluginName . '/views/client/widget.php' );
+					rename($downloadPath . '/views/admin/widget.php', $installPath . 'views/admin/widget.php' );
+					rename($downloadPath . '/views/client/widget.php', $installPath . 'views/client/widget.php' );
 					break;
 				case 'shortcode':
-					mkdir( $pluginPath . '/' . $pluginName . '/classes/shortcodes/' );
-					rename( $downloadPath . '/classes/shortcodes/shortcode.php', $pluginPath . '/' . $pluginName . '/classes/shortcodes/shortcode.php' );
-					rename( $downloadPath . '/classes/shortcodes/shortcode-factory.php', $pluginPath . '/' . $pluginName . '/classes/shortcodes/shortcode-factory.php' );
+					mkdir( $installPath . 'classes/shortcodes/' );
+					rename( $downloadPath . '/classes/shortcodes/shortcode.php', $installPath . 'classes/shortcodes/shortcode.php' );
+					rename( $downloadPath . '/classes/shortcodes/shortcode-factory.php', $installPath . 'classes/shortcodes/shortcode-factory.php' );
 					break;
 			}
 		}
 
-		// Replace
-		$pluginCompletePath = $pluginPath . '/' . $pluginName . '/';
-
 		// text domain
-		self::doStrReplace( $pluginCompletePath, 'bea-plugin-boilerplate', $pluginName );
+		self::doStrReplace( $installPath, 'bea-plugin-boilerplate', $pluginName );
 
 		// init function
-		self::doStrReplace( $pluginCompletePath, 'init_bea_pb_plugin', 'init_' . str_replace( '-', '_', $pluginName ) . '_plugin' );
-
+		self::doStrReplace( $installPath, 'init_bea_pb_plugin', 'init_' . str_replace( '-', '_', $pluginName ) . '_plugin' );
 		$io->writeln( '' );
 
 		// plugin human name
 		$pluginRealName = $this->askAndConfirm( $io, "What is your plugin real name ? (e.g: 'My great plugin') " );
-		self::doStrReplace( $pluginCompletePath, 'BEA Plugin Name', $pluginRealName );
+		self::doStrReplace( $installPath, 'BEA Plugin Name', $pluginRealName );
 
 		// namespace
 		$pluginNamespace = $this->askAndConfirm( $io, "What is your plugin's namespace ? (e.g: 'My_company\\My_Plugin') " );
-		self::doStrReplace( $pluginCompletePath, 'BEA\\PB', $pluginNamespace );
+		self::doStrReplace( $installPath, 'BEA\\PB', $pluginNamespace );
 
 		// constants prefix
 		$pluginConstsPrefix = $this->askAndConfirm( $io, "What is your constants prefix ? (e.g: 'MY_COMPANY_MY_PLUGIN_') " );
 		if ( '_' !== substr( $pluginConstsPrefix, - 1 ) ) {
 			$pluginConstsPrefix = $pluginConstsPrefix . '_';
 		}
-		self::doStrReplace( $pluginCompletePath, 'BEA_PB_', $pluginConstsPrefix );
+		self::doStrReplace( $installPath, 'BEA_PB_', $pluginConstsPrefix );
 
 		// view folder
 		$pluginViewFolderName = $this->askAndConfirm( $io, "What is your plugin's view folder name ? (e.g: 'my-plugin') " );
-		self::doStrReplace( $pluginCompletePath, 'bea-pb', $pluginViewFolderName );
+		self::doStrReplace( $installPath, 'bea-pb', $pluginViewFolderName );
 
 		$io->success( 'Your plugin is ready ! :)' );
 	}
@@ -248,5 +253,21 @@ class ScaffoldPluginCommand extends BaseCommand {
 		$p->setDistUrl( 'https://github.com/BeAPI/bea-plugin-boilerplate/archive/master.zip' );
 
 		return $p;
+	}
+
+	/**
+	 * Create dummy wordpress-plugin package to get the installation path
+	 *
+	 * @param string $pluginName
+	 * @param Composer $composer
+	 *
+	 * @return string
+	 */
+	protected function getInstallPath( $pluginName, $composer ) {
+		$plugin = new Package( $pluginName, 'dev-master', 'Latest' );
+		$plugin->setType( self::WP_PLUGIN_PACKAGE_TYPE );
+		$path = $composer->getInstallationManager()->getInstallPath( $plugin );
+
+		return \rtrim( $path, '/' ) . '/';
 	}
 }
