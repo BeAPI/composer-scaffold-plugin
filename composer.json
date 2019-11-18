@@ -1,5 +1,5 @@
 {
-	"name": "bea/composer/scaffold-plugin",
+	"name": "beapi/composer-scaffold-plugin",
 	"type": "composer-plugin",
 	"license": "MIT",
 	"authors": [
