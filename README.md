@@ -15,7 +15,7 @@ Increase your workflow when creating a new plugin. By launching this composer co
 ## 1 - Add to [Composer](http://composer.rarst.net/)
 
 - Add repository source : `{ "type": "vcs", "url": "https://github.com/BeAPI/composer-scaffold-plugin" }`.
-- Include `"bea/composer/scaffold-plugin": "dev-master"` into your composer.json file as require dev.
+- Include `"beapi/composer-scaffold-plugin": "dev-master"` into your composer.json file as require dev.
 - Then `composer update` before use.
 
 ## 2 - Run command 
