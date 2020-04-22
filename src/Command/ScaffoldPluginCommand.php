@@ -2,6 +2,7 @@
 
 use Composer\Command\BaseCommand;
 use Composer\Composer;
+use Composer\Json\JsonFile;
 use Composer\Package\Package;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -31,6 +32,7 @@ class ScaffoldPluginCommand extends BaseCommand {
 	protected function execute( InputInterface $input, OutputInterface $output ) {
 		$io         = new SymfonyStyle( $input, $output );
 		$composer   = $this->getComposer();
+
 		$pluginName = $input->getArgument( 'folder' );
 		$components = $input->getArgument( 'components' );
 
@@ -181,7 +183,28 @@ class ScaffoldPluginCommand extends BaseCommand {
 		$pluginViewFolderName = $this->askAndConfirm( $io, "What is your plugin's view folder name ? (e.g: 'my-plugin') " );
 		self::doStrReplace( $installPath, 'bea-pb', $pluginViewFolderName );
 
+		/**
+		 * Add the new namespace to the autoload entry of the composer.json file.
+		 *
+		 */
+		$composerPath = $composer->getConfig()->getConfigSource()->getName();
+		$composerFile = new JsonFile( $composerPath );
+
+		try {
+			$composerJson = $composerFile->read();
+			$composerJson['autoload']['psr-4'][$pluginNamespace."\\"] = $installPath.'/classes/';
+
+
+			$composerFile->write( $composerJson );
+			$output->writeln( "The namespace have been added to the composer.json file !" );
+		} catch ( RuntimeException $e ) {
+			$output->writeln( "<error>An error occurred</error>" );
+			$output->writeln( sprintf( "<error>%s</error>", $e->getMessage() ) );
+			exit;
+		}
+
 		$io->success( 'Your plugin is ready ! :)' );
+		$io->success( 'Run composer dump-autoload to make the autoloading work :)' );
 	}
 
 	/**
