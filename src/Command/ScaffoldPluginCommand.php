@@ -6,6 +6,7 @@ use Composer\Json\JsonFile;
 use Composer\Package\Package;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
@@ -26,15 +27,22 @@ class ScaffoldPluginCommand extends BaseCommand {
 	);
 
 	protected function configure() {
-		$this->setName( 'scaffold-plugin' )->setDescription( 'Bootstrap a new WordPress plugin using Be API\'s boilerplate.' )->addArgument( 'folder', InputArgument::REQUIRED, "Your plugin's folder name" )->addArgument( 'components', InputArgument::IS_ARRAY, "Optional components you want to include in your plugin.\n Available components are :\n\t- Controller\n\t- Cron\n\t- Model\n\t- Route\n\t- Widget\n\t- Shortcode" );
+		$this->setName( 'scaffold-plugin' )
+		     ->setDescription( 'Bootstrap a new WordPress plugin using Be API\'s boilerplate.' )
+		     ->addArgument( 'folder', InputArgument::REQUIRED, "Your plugin's folder name" )
+		     ->addArgument( 'components', InputArgument::IS_ARRAY, "Optional components you want to include in your plugin.\n Available components are :\n\t- Controller\n\t- Cron\n\t- Model\n\t- Route\n\t- Widget\n\t- Shortcode" )
+		     ->addOption( 'boilerplate-version', null, InputOption::VALUE_OPTIONAL, 'Wich version of boilerplate to use', 'Latest' )
+		     ->addOption( 'no-autoload', null, InputOption::VALUE_NONE, 'Do not Autoload the class in composer.json' );
 	}
 
 	protected function execute( InputInterface $input, OutputInterface $output ) {
-		$io         = new SymfonyStyle( $input, $output );
-		$composer   = $this->getComposer();
+		$io       = new SymfonyStyle( $input, $output );
+		$composer = $this->getComposer();
 
-		$pluginName = $input->getArgument( 'folder' );
-		$components = $input->getArgument( 'components' );
+		$pluginName  = $input->getArgument( 'folder' );
+		$components  = $input->getArgument( 'components' );
+		$version     = $input->getOption( 'boilerplate-version' );
+		$no_autoload = $input->getOption( 'no-autoload' );
 
 		$io->block( [
 			'',
@@ -43,27 +51,27 @@ class ScaffoldPluginCommand extends BaseCommand {
 		], null, 'bg=blue;fg=white' );
 
 		$io->writeln( [
-				'',
-				"Scaffolding plugin: <info>$pluginName</info>",
-				'',
-			] );
+			'',
+			"Scaffolding plugin: <info>$pluginName</info>",
+			'',
+		] );
 
 		// Get plugin components
 		if ( ! empty( $components ) ) {
 			$io->writeln( 'You have selected those components for your plugin :' . \join( ', ', \array_map( function ( $i ) {
-						return "<comment>$i</comment>";
-					}, $components ) ) );
+					return "<comment>$i</comment>";
+				}, $components ) ) );
 
 			if ( false === $io->confirm( "Is that Ok for you ? ", true ) ) {
 				exit;
 			}
 		} else {
 			$io->writeln( [
-					'You have not selected any additional components for your plugin',
-					'(Available components are: ' . \join( ', ', \array_map( function ( $i ) {
-							return "<comment>$i</comment>";
-						}, $this->available_components ) ) . ')',
-				] );
+				'You have not selected any additional components for your plugin',
+				'(Available components are: ' . \join( ', ', \array_map( function ( $i ) {
+					return "<comment>$i</comment>";
+				}, $this->available_components ) ) . ')',
+			] );
 
 			if ( false === $io->confirm( "Is that Ok for you ? ", true ) ) {
 				exit;
@@ -86,7 +94,7 @@ class ScaffoldPluginCommand extends BaseCommand {
 
 		// Ensure we have boilerplate plugin locally
 		if ( ! file_exists( $downloadPath . '/bea-plugin-boilerplate.php' ) ) {
-			$composer->getDownloadManager()->download( $this->getPluginBoilerplatePackage(), $downloadPath );
+			$composer->getDownloadManager()->download( $this->getPluginBoilerplatePackage( $version ), $downloadPath );
 		}
 
 		if ( ! file_exists( $downloadPath . '/bea-plugin-boilerplate.php' ) ) {
@@ -146,8 +154,8 @@ class ScaffoldPluginCommand extends BaseCommand {
 					rename( $downloadPath . '/classes/widgets/main.php', $installPath . 'classes/widgets/main.php' );
 
 					// Views
-					rename($downloadPath . '/views/admin/widget.php', $installPath . 'views/admin/widget.php' );
-					rename($downloadPath . '/views/client/widget.php', $installPath . 'views/client/widget.php' );
+					rename( $downloadPath . '/views/admin/widget.php', $installPath . 'views/admin/widget.php' );
+					rename( $downloadPath . '/views/client/widget.php', $installPath . 'views/client/widget.php' );
 					break;
 				case 'shortcode':
 					mkdir( $installPath . 'classes/shortcodes/' );
@@ -183,28 +191,31 @@ class ScaffoldPluginCommand extends BaseCommand {
 		$pluginViewFolderName = $this->askAndConfirm( $io, "What is your plugin's view folder name ? (e.g: 'my-plugin') " );
 		self::doStrReplace( $installPath, 'bea-pb', $pluginViewFolderName );
 
-		/**
-		 * Add the new namespace to the autoload entry of the composer.json file.
-		 *
-		 */
-		$composerPath = $composer->getConfig()->getConfigSource()->getName();
-		$composerFile = new JsonFile( $composerPath );
+		if ( false === $no_autoload ) {
 
-		try {
-			$composerJson = $composerFile->read();
-			$composerJson['autoload']['psr-4'][$pluginNamespace."\\"] = $installPath.'/classes/';
+			/**
+			 * Add the new namespace to the autoload entry of the composer.json file.
+			 *
+			 */
+			$composerPath = $composer->getConfig()->getConfigSource()->getName();
+			$composerFile = new JsonFile( $composerPath );
+
+			try {
+				$composerJson                                                 = $composerFile->read();
+				$composerJson['autoload']['psr-4'][ $pluginNamespace . "\\" ] = $installPath . '/classes/';
 
 
-			$composerFile->write( $composerJson );
-			$output->writeln( "The namespace have been added to the composer.json file !" );
-		} catch ( RuntimeException $e ) {
-			$output->writeln( "<error>An error occurred</error>" );
-			$output->writeln( sprintf( "<error>%s</error>", $e->getMessage() ) );
-			exit;
+				$composerFile->write( $composerJson );
+				$output->writeln( "The namespace have been added to the composer.json file !" );
+			} catch ( RuntimeException $e ) {
+				$output->writeln( "<error>An error occurred</error>" );
+				$output->writeln( sprintf( "<error>%s</error>", $e->getMessage() ) );
+				exit;
+			}
+
+			$io->success( 'Run composer dump-autoload to make the autoloading work :)' );
 		}
-
 		$io->success( 'Your plugin is ready ! :)' );
-		$io->success( 'Run composer dump-autoload to make the autoloading work :)' );
 	}
 
 	/**
@@ -267,13 +278,22 @@ class ScaffoldPluginCommand extends BaseCommand {
 	/**
 	 * Setup a dummy package for Composer to download
 	 *
+	 * @param $version
+	 *
 	 * @return Package
 	 */
-	protected function getPluginBoilerplatePackage() {
-		$p = new Package( 'plugin-boilerplate', 'dev-master', 'Latest' );
+	protected function getPluginBoilerplatePackage( $version ) {
+		$p = new Package( 'plugin-boilerplate', 'dev-master', $version );
 		$p->setType( 'library' );
 		$p->setDistType( 'zip' );
-		$p->setDistUrl( 'https://github.com/BeAPI/bea-plugin-boilerplate/archive/master.zip' );
+
+		$dist_url = "https://github.com/BeAPI/bea-plugin-boilerplate/archive/master.zip";
+
+		if ( $version !== 'Latest' ) {
+			$dist_url = sprintf( 'https://github.com/BeAPI/bea-plugin-boilerplate/archive/%s.zip', $version );
+		}
+
+		$p->setDistUrl( $dist_url );
 
 		return $p;
 	}
