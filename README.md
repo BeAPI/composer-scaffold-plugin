@@ -20,7 +20,7 @@ Increase your workflow when creating a new plugin. By launching this composer co
 
 ## 2 - Run command 
 
-Then you can launch `composer scaffold-plugin <folder> [<components>]` :
+Then you can launch `composer scaffold-plugin [--boilerplate-version [BOILERPLATE-VERSION]] [--no-autoload] <folder> [<components>]` :
 
 ![List of arguments](screenshot.png)
 
