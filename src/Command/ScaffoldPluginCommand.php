@@ -107,19 +107,46 @@ class ScaffoldPluginCommand extends BaseCommand {
 			exit;
 		}
 
+		$is_psr_4 = is_dir( $downloadPath . '/classes/Admin/' );
+		if ( $is_psr_4 ) {
+			$io->writeln( '<info>Plugin with PSR-4 detected</info>' );
+		} else {
+			$io->writeln( '<info>Plugin without PSR-4 detected</info>' );
+		}
+
 		// Basic plugin files
-		mkdir( $installPath . 'classes/admin/', 0755, true );
-
+		if ( ! $is_psr_4 ) {
+			mkdir( $installPath . '/classes/admin/', 0755, true );
+		} else {
+			mkdir( $installPath . '/classes/Admin/', 0755, true );
+		}
 		rename( $downloadPath . '/bea-plugin-boilerplate.php', $installPath . $pluginName . '.php' );
-		rename( $downloadPath . '/compat.php', $installPath . 'compat.php' );
-		rename( $downloadPath . '/autoload.php', $installPath . 'autoload.php' );
 
-		// Basic plugin classes
-		rename( $downloadPath . '/classes/plugin.php', $installPath . 'classes/plugin.php' );
-		rename( $downloadPath . '/classes/main.php', $installPath . 'classes/main.php' );
-		rename( $downloadPath . '/classes/helpers.php', $installPath . 'classes/helpers.php' );
-		rename( $downloadPath . '/classes/singleton.php', $installPath . 'classes/singleton.php' );
-		rename( $downloadPath . '/classes/admin/main.php', $installPath . 'classes/admin/main.php' );
+		if ( ! $is_psr_4 ) {
+			/**
+			 * Non PSR-4
+			 */
+			rename( $downloadPath . '/compat.php', $installPath . 'compat.php' );
+			rename( $downloadPath . '/autoload.php', $installPath . 'autoload.php' );
+
+			// Basic plugin classes
+			rename( $downloadPath . '/classes/plugin.php', $installPath . 'classes/plugin.php' );
+			rename( $downloadPath . '/classes/main.php', $installPath . 'classes/main.php' );
+			rename( $downloadPath . '/classes/helpers.php', $installPath . 'classes/helpers.php' );
+			rename( $downloadPath . '/classes/singleton.php', $installPath . 'classes/singleton.php' );
+			rename( $downloadPath . '/classes/admin/main.php', $installPath . 'classes/admin/main.php' );
+		} else {
+			/**
+			 * PSR-4
+			 */
+			// Basic plugin classes
+			rename( $downloadPath . '/classes/Compatibility.php', $installPath . 'classes/Compatibility.php' );
+			rename( $downloadPath . '/classes/Plugin.php', $installPath . 'classes/Plugin.php' );
+			rename( $downloadPath . '/classes/Main.php', $installPath . 'classes/Main.php' );
+			rename( $downloadPath . '/classes/Helpers.php', $installPath . 'classes/Helpers.php' );
+			rename( $downloadPath . '/classes/Singleton.php', $installPath . 'classes/Singleton.php' );
+			rename( $downloadPath . '/classes/Admin/Main.php', $installPath . 'classes/Admin/Main.php' );
+		}
 
 		foreach ( $this->available_components as $component ) {
 			if ( ! in_array( $component, $components ) ) {
@@ -128,39 +155,74 @@ class ScaffoldPluginCommand extends BaseCommand {
 
 			switch ( $component ) {
 				case 'controller':
-					mkdir( $installPath . 'classes/controllers/' );
-					rename( $downloadPath . '/classes/controllers/controller.php', $installPath . 'classes/controllers/controller.php' );
+					if ( ! $is_psr_4 ) {
+						mkdir( $installPath . 'classes/controllers/' );
+						rename( $downloadPath . '/classes/controllers/controller.php', $installPath . 'classes/controllers/controller.php' );
+					} else {
+						mkdir( $installPath . 'classes/Controllers/' );
+						rename( $downloadPath . '/classes/Controllers/Controller.php', $installPath . 'classes/Controllers/Controller.php' );
+					}
 					break;
 				case 'cron':
-					mkdir( $installPath . 'classes/cron/' );
-					rename( $downloadPath . '/classes/cron/cron.php', $installPath . 'classes/cron/cron.php' );
+					if ( ! $is_psr_4 ) {
+						mkdir( $installPath . 'classes/cron/' );
+						rename( $downloadPath . '/classes/cron/cron.php', $installPath . 'classes/cron/cron.php' );
+					} else {
+						mkdir( $installPath . 'classes/Cron/' );
+						rename( $downloadPath . '/classes/Cron/Cron.php', $installPath . 'classes/Cron/Cron.php' );
+					}
 					break;
 				case 'model':
-					mkdir( $installPath . 'classes/models/' );
-					rename( $downloadPath . '/classes/models/model.php', $installPath . 'classes/models/model.php' );
-					rename( $downloadPath . '/classes/models/user.php', $installPath . 'classes/models/user.php' );
+					if ( ! $is_psr_4 ) {
+						mkdir( $installPath . 'classes/models/' );
+						rename( $downloadPath . '/classes/models/model.php', $installPath . 'classes/models/model.php' );
+						rename( $downloadPath . '/classes/models/user.php', $installPath . 'classes/models/user.php' );
+					} else {
+						mkdir( $installPath . 'classes/Models/' );
+						rename( $downloadPath . '/classes/Models/Model.php', $installPath . 'classes/Models/Model.php' );
+						rename( $downloadPath . '/classes/Models/User.php', $installPath . 'classes/Models/User.php' );
+					}
 					break;
 				case 'route':
-					mkdir( $installPath . 'classes/routes/' );
-					rename( $downloadPath . '/classes/routes/router.php', $installPath . 'classes/routes/router.php' );
+					if ( ! $is_psr_4 ) {
+						mkdir( $installPath . 'classes/routes/' );
+						rename( $downloadPath . '/classes/routes/router.php', $installPath . 'classes/routes/router.php' );
+					} else {
+						mkdir( $installPath . 'classes/Routes/' );
+						rename( $downloadPath . '/classes/Routes/Router.php', $installPath . 'classes/Routes/Router.php' );
+					}
 					break;
 				case 'widget':
-					mkdir( $installPath . 'classes/widgets/' );
+					if ( ! \is_dir($downloadPath . '/views/' ) ) {
+						$io->writeln( '<error>Widgets aren\'t supported on your version, no folders will be generated.</error>' );
+						continue 2;
+					}
+
 					mkdir( $installPath . 'views/' );
 					mkdir( $installPath . 'views/admin/' );
 					mkdir( $installPath . 'views/client/' );
-
-					// Class
-					rename( $downloadPath . '/classes/widgets/main.php', $installPath . 'classes/widgets/main.php' );
-
 					// Views
 					rename( $downloadPath . '/views/admin/widget.php', $installPath . 'views/admin/widget.php' );
 					rename( $downloadPath . '/views/client/widget.php', $installPath . 'views/client/widget.php' );
+
+					mkdir( $installPath . 'classes/widgets/' );
+
+					// Class
+					rename( $downloadPath . '/classes/widgets/main.php', $installPath . 'classes/widgets/main.php' );
 					break;
 				case 'shortcode':
-					mkdir( $installPath . 'classes/shortcodes/' );
-					rename( $downloadPath . '/classes/shortcodes/shortcode.php', $installPath . 'classes/shortcodes/shortcode.php' );
-					rename( $downloadPath . '/classes/shortcodes/shortcode-factory.php', $installPath . 'classes/shortcodes/shortcode-factory.php' );
+					if ( ! $is_psr_4 ) {
+
+						mkdir( $installPath . 'classes/shortcodes/' );
+						rename( $downloadPath . '/classes/shortcodes/shortcode.php', $installPath . 'classes/shortcodes/shortcode.php' );
+						rename( $downloadPath . '/classes/shortcodes/shortcode-factory.php', $installPath . 'classes/shortcodes/shortcode-factory.php' );
+					} else {
+						mkdir( $installPath . 'classes/Shortcodes/' );
+
+						rename( $downloadPath . '/classes/Shortcodes/Shortcode.php', $installPath . 'classes/Shortcodes/Shortcode.php' );
+						rename( $downloadPath . '/classes/Shortcodes/Shortcode_Factory.php', $installPath . 'classes/Shortcodes/Shortcode_Factory.php' );
+
+					}
 					break;
 			}
 		}
