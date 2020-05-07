@@ -1,5 +1,12 @@
 # Changelog ##
 
+## 2.2.0 - 05 May 202
+* Handle psr-4 and no psr-4 plugins
+* Add the autoload of files directly to the composer.json file
+* Add the --no-autoload option
+* Add the --boilerplate-version option
+* Handle the case when the widget component is not available
+
 ## 2.1.0 - 17 Dec 2019
 * Fix hardcoded path when scaffolding a new plugin
 
