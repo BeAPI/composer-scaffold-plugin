@@ -14,7 +14,7 @@ Increase your workflow when creating a new plugin. By launching this composer co
 
 ## 1 - Add to [Composer](http://composer.rarst.net/)
 
-- Add it to your project `composer required beapi/composer-scaffold-plugin`.
+- Add it to your project `composer require beapi/composer-scaffold-plugin`.
 
 ## 2 - Run command 
 
