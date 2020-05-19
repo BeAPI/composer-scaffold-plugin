@@ -1,6 +1,9 @@
 # Changelog ##
 
-## 2.2.0 - 05 May 202
+## 2.2.1 - 19 May 2020
+* Remove trailing slash from plugin path when creating PSR4 mapping
+
+## 2.2.0 - 05 May 2020
 * Handle psr-4 and no psr-4 plugins
 * Add the autoload of files directly to the composer.json file
 * Add the --no-autoload option
