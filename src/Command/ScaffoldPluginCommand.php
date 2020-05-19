@@ -264,8 +264,7 @@ class ScaffoldPluginCommand extends BaseCommand {
 
 			try {
 				$composerJson                                                 = $composerFile->read();
-				$composerJson['autoload']['psr-4'][ $pluginNamespace . "\\" ] = $installPath . '/classes/';
-
+				$composerJson['autoload']['psr-4'][ $pluginNamespace . "\\" ] = rtrim( $installPath, '/' ) . '/classes/';
 
 				$composerFile->write( $composerJson );
 				$output->writeln( "The namespace have been added to the composer.json file !" );
