@@ -107,7 +107,7 @@ class ScaffoldPluginCommand extends BaseCommand {
 			exit;
 		}
 
-		$is_psr_4 = is_dir( $downloadPath . '/classes/Admin/' );
+		$is_psr_4 = ! file_exists( $downloadPath . '/autoload.php' );
 		if ( $is_psr_4 ) {
 			$io->writeln( '<info>Plugin with PSR-4 detected</info>' );
 		} else {
