@@ -23,6 +23,15 @@ class ScaffoldPlugin implements PluginInterface, Capable, CommandProvider {
 		$this->io       = $io;
 	}
 
+	public function deactivate( Composer $composer, IOInterface $io ) {
+		// Unused method from PluginInterface
+	}
+
+	public function uninstall( Composer $composer, IOInterface $io ) {
+		// Unused method from PluginInterface
+	}
+
+
 	public function getCapabilities() {
 		return [
 			'Composer\Plugin\Capability\CommandProvider' => __NAMESPACE__ . '\\ScaffoldPlugin',
