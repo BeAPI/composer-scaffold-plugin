@@ -94,7 +94,10 @@ class ScaffoldPluginCommand extends BaseCommand {
 
 		// Ensure we have boilerplate plugin locally
 		if ( ! file_exists( $downloadPath . '/bea-plugin-boilerplate.php' ) ) {
-			$composer->getDownloadManager()->download( $this->getPluginBoilerplatePackage( $version ), $downloadPath );
+			$package = $this->getPluginBoilerplatePackage( $version );
+			$promise = $composer->getDownloadManager()->download( $package, $downloadPath );
+			$composer->getLoop()->wait([$promise]);
+			$composer->getDownloadManager()->install($package, $downloadPath);
 		}
 
 		if ( ! file_exists( $downloadPath . '/bea-plugin-boilerplate.php' ) ) {
@@ -345,12 +348,13 @@ class ScaffoldPluginCommand extends BaseCommand {
 	protected function getPluginBoilerplatePackage( $version ) {
 		$p = new Package( 'plugin-boilerplate', 'dev-master', $version );
 		$p->setType( 'library' );
+		$p->setInstallationSource('dist');
 		$p->setDistType( 'zip' );
 
 		$dist_url = "https://github.com/BeAPI/bea-plugin-boilerplate/archive/master.zip";
 
 		if ( $version !== 'Latest' ) {
-			$dist_url = sprintf( 'https://github.com/BeAPI/bea-plugin-boilerplate/archive/%s.zip', $version );
+			$dist_url = sprintf( 'https://github.com/BeAPI/bea-plugin-boilerplate/archive/%s', $version );
 		}
 
 		$p->setDistUrl( $dist_url );
