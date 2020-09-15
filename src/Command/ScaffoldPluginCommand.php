@@ -107,7 +107,7 @@ class ScaffoldPluginCommand extends BaseCommand {
 			exit;
 		}
 
-		$is_psr_4 = is_dir( $downloadPath . '/classes/Admin/' );
+		$is_psr_4 = ! file_exists( $downloadPath . '/autoload.php' );
 		if ( $is_psr_4 ) {
 			$io->writeln( '<info>Plugin with PSR-4 detected</info>' );
 		} else {
@@ -253,11 +253,10 @@ class ScaffoldPluginCommand extends BaseCommand {
 		$pluginViewFolderName = $this->askAndConfirm( $io, "What is your plugin's view folder name ? (e.g: 'my-plugin') " );
 		self::doStrReplace( $installPath, 'bea-pb', $pluginViewFolderName );
 
-		if ( false === $no_autoload ) {
+		if ( $is_psr_4 && false === $no_autoload ) {
 
 			/**
 			 * Add the new namespace to the autoload entry of the composer.json file.
-			 *
 			 */
 			$composerPath = $composer->getConfig()->getConfigSource()->getName();
 			$composerFile = new JsonFile( $composerPath );
