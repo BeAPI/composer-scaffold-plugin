@@ -1,5 +1,11 @@
 # Changelog ##
 
+## 2.3.0 - 25 Oct 2020
+* Add support for Composer 2
+
+## 2.2.2 - 15 Sept 2020
+* Fix PSR-4 detection
+
 ## 2.2.1 - 19 May 2020
 * Remove trailing slash from plugin path when creating PSR4 mapping
 
