@@ -95,9 +95,7 @@ class ScaffoldPluginCommand extends BaseCommand {
 		// Ensure we have boilerplate plugin locally
 		if ( ! file_exists( $downloadPath . '/bea-plugin-boilerplate.php' ) ) {
 			$package = $this->getPluginBoilerplatePackage( $version );
-			$promise = $composer->getDownloadManager()->download( $package, $downloadPath );
-			$composer->getLoop()->wait([$promise]);
-			$composer->getDownloadManager()->install($package, $downloadPath);
+			$this->downloadPackage( $composer, $package, $downloadPath );
 		}
 
 		if ( ! file_exists( $downloadPath . '/bea-plugin-boilerplate.php' ) ) {
@@ -339,6 +337,26 @@ class ScaffoldPluginCommand extends BaseCommand {
 	}
 
 	/**
+	 * Download a package.
+	 *
+	 * @param Composer $composer
+	 * @param Package $package
+	 * @param string $path
+	 */
+	protected function downloadPackage( Composer $composer, Package $package, $path ) {
+		if ( version_compare( Composer::RUNTIME_API_VERSION, '2.0', '>=' ) ) {
+			$promise = $composer->getDownloadManager()->download( $package, $path );
+			$composer->getLoop()->wait([$promise]);
+			$promise = $composer->getDownloadManager()->install($package, $path);
+			$composer->getLoop()->wait([$promise]);
+		} else {
+			$composer
+				->getDownloadManager()
+				->download($package, $path);
+		}
+	}
+
+	/**
 	 * Setup a dummy package for Composer to download
 	 *
 	 * @param $version
@@ -354,7 +372,7 @@ class ScaffoldPluginCommand extends BaseCommand {
 		$dist_url = "https://github.com/BeAPI/bea-plugin-boilerplate/archive/master.zip";
 
 		if ( $version !== 'Latest' ) {
-			$dist_url = sprintf( 'https://github.com/BeAPI/bea-plugin-boilerplate/archive/%s', $version );
+			$dist_url = sprintf( 'https://github.com/BeAPI/bea-plugin-boilerplate/archive/%s.zip', $version );
 		}
 
 		$p->setDistUrl( $dist_url );
