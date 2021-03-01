@@ -147,6 +147,18 @@ class ScaffoldPluginCommand extends BaseCommand {
 			rename( $downloadPath . '/classes/Helpers.php', $installPath . 'classes/Helpers.php' );
 			rename( $downloadPath . '/classes/Singleton.php', $installPath . 'classes/Singleton.php' );
 			rename( $downloadPath . '/classes/Admin/Main.php', $installPath . 'classes/Admin/Main.php' );
+
+			// Since Boilerplate 3.2.0
+			if ( is_readable( $downloadPath . '/classes/Blocks.php' ) ) {
+				mkdir( $installPath . '/classes/Blocks/', 0755, true );
+				rename( $downloadPath . '/classes/Blocks.php', $installPath . 'classes/Blocks.php' );
+				rename( $downloadPath . '/classes/Blocks/Acf_Block.php', $installPath . 'classes/Blocks/Acf_Block.php' );
+				rename( $downloadPath . '/classes/Blocks/Acf_Block_Interface.php', $installPath . 'classes/Blocks/Acf_Block_Interface.php' );
+				rename( $downloadPath . '/classes/Blocks/Block.php', $installPath . 'classes/Blocks/Block.php' );
+				rename( $downloadPath . '/classes/Blocks/Block_Interface.php', $installPath . 'classes/Blocks/Block_Interface.php' );
+				rename( $downloadPath . '/classes/Blocks/Dynamic_Block.php', $installPath . 'classes/Blocks/Dynamic_Block.php' );
+				rename( $downloadPath . '/classes/Blocks/Dynamic_Block_Interface.php', $installPath . 'classes/Blocks/Dynamic_Block_Interface.php' );
+			}
 		}
 
 		foreach ( $this->available_components as $component ) {
