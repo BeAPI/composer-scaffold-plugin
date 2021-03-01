@@ -1,5 +1,8 @@
 # Changelog ##
 
+## 2.3.1 - 01 Mar 2021
+* Synchronize scaffolding process with the new classes in boilerplate
+
 ## 2.3.0 - 25 Oct 2020
 * Add support for Composer 2
 

@@ -1,6 +1,6 @@
 Composer Scaffold Plugin / External composer command to scaffold a plugin with the "BEA Plugin Boilerplate".
 
-Copyright 2017-2018 Be API and contributors
+Copyright 2017-2021 Be API and contributors
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@ permission notices:
 
   Composer Scaffold Plugin / External composer command to scaffold a plugin with the "BEA Plugin Boilerplate".
 
-  Copyright 2017-2018 Be API and contributors
+  Copyright 2017-2021 Be API and contributors
 
   Composer Scaffold Plugin is released under the GPL
 
