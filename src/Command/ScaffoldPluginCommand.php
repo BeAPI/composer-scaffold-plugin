@@ -266,6 +266,9 @@ class ScaffoldPluginCommand extends BaseCommand {
 		$pluginViewFolderName = $this->askAndConfirm( $io, "What is your plugin's view folder name ? (e.g: 'my-plugin') " );
 		self::doStrReplace( $installPath, 'bea-pb', $pluginViewFolderName );
 
+		// blocks filter
+		self::doStrReplace( $installPath, 'bea_pb_blocks', str_replace( '-', '_', $pluginName ) . '_blocks' );
+
 		if ( $is_psr_4 && false === $no_autoload ) {
 
 			/**
