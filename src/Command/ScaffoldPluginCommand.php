@@ -251,6 +251,10 @@ class ScaffoldPluginCommand extends BaseCommand {
 		$pluginRealName = $this->askAndConfirm( $io, "What is your plugin real name ? (e.g: 'My great plugin') " );
 		self::doStrReplace( $installPath, 'BEA Plugin Name', $pluginRealName );
 
+		// plugin description human name
+		$pluginDescription = $this->askAndConfirm( $io, "What is your plugin description ? (e.g: 'Manage CPT xxx') " );
+		self::doStrReplace( $installPath, 'Your plugin description', $pluginDescription );
+
 		// namespace
 		$pluginNamespace = $this->askAndConfirm( $io, "What is your plugin's namespace ? (e.g: 'My_company\\My_Plugin') " );
 		self::doStrReplace( $installPath, 'BEA\\PB', $pluginNamespace );
