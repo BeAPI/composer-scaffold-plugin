@@ -141,12 +141,9 @@ class ScaffoldPluginCommand extends BaseCommand {
 			 * PSR-4
 			 */
 			// Basic plugin classes
-			rename( $downloadPath . '/classes/Compatibility.php', $installPath . 'classes/Compatibility.php' );
-			rename( $downloadPath . '/classes/Plugin.php', $installPath . 'classes/Plugin.php' );
 			rename( $downloadPath . '/classes/Main.php', $installPath . 'classes/Main.php' );
 			rename( $downloadPath . '/classes/Helpers.php', $installPath . 'classes/Helpers.php' );
 			rename( $downloadPath . '/classes/Singleton.php', $installPath . 'classes/Singleton.php' );
-			rename( $downloadPath . '/classes/Admin/Main.php', $installPath . 'classes/Admin/Main.php' );
 
 			// Since Boilerplate 3.2.0
 			if ( is_readable( $downloadPath . '/classes/Blocks.php' ) ) {
