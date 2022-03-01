@@ -1,5 +1,9 @@
 # Changelog ##
 
+## 2.4.1 - 01 Mar 2022
+* Support composer/installers ^2.0
+* Don't create empty `Admin` directory during plugin scaffolding
+
 ## 2.4.0 - 20 Sept 2021
 * Synchronize scaffolding process with the new classes in boilerplate
 * Add replacement for plugin description
