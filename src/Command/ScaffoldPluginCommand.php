@@ -119,8 +119,9 @@ class ScaffoldPluginCommand extends BaseCommand {
 		if ( ! $is_psr_4 ) {
 			mkdir( $installPath . '/classes/admin/', 0755, true );
 		} else {
-			mkdir( $installPath . '/classes/Admin/', 0755, true );
+			mkdir( $installPath . '/classes/', 0755, true );
 		}
+
 		rename( $downloadPath . '/bea-plugin-boilerplate.php', $installPath . $pluginName . '.php' );
 
 		if ( ! $is_psr_4 ) {
