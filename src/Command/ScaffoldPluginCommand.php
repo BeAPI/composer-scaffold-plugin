@@ -4,6 +4,7 @@ use Composer\Command\BaseCommand;
 use Composer\Composer;
 use Composer\Json\JsonFile;
 use Composer\Package\Package;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -26,6 +27,9 @@ class ScaffoldPluginCommand extends BaseCommand {
 		'shortcode',
 	);
 
+	/**
+	 * @inheritDoc
+	 */
 	protected function configure() {
 		$this->setName( 'scaffold-plugin' )
 		     ->setDescription( 'Bootstrap a new WordPress plugin using Be API\'s boilerplate.' )
@@ -35,6 +39,9 @@ class ScaffoldPluginCommand extends BaseCommand {
 		     ->addOption( 'no-autoload', null, InputOption::VALUE_NONE, 'Do not Autoload the class in composer.json' );
 	}
 
+	/**
+	 * @inheritDoc
+	 */
 	protected function execute( InputInterface $input, OutputInterface $output ) {
 		$io       = new SymfonyStyle( $input, $output );
 		$composer = $this->getComposer();
@@ -84,12 +91,12 @@ class ScaffoldPluginCommand extends BaseCommand {
 			$installPath = $this->getInstallPath( $pluginName, $composer );
 		} catch ( \InvalidArgumentException $e ) {
 			$io->error( "Couldn't get WordPress plugins directory." );
-			exit;
+			return Command::FAILURE;
 		}
 
 		if ( is_dir( $installPath ) ) {
 			$io->error( "A plugin with this folder's name already exist." );
-			exit;
+			return Command::FAILURE;
 		}
 
 		// Ensure we have boilerplate plugin locally
@@ -100,12 +107,12 @@ class ScaffoldPluginCommand extends BaseCommand {
 
 		if ( ! file_exists( $downloadPath . '/bea-plugin-boilerplate.php' ) ) {
 			$io->error( "Couldn't download plugin boilerplate from Github." );
-			exit;
+			return Command::FAILURE;
 		}
 
 		if ( ! mkdir( $installPath ) ) {
 			$io->error( "Couldn't create the plugin directory." );
-			exit;
+			return Command::FAILURE;
 		}
 
 		$is_psr_4 = ! file_exists( $downloadPath . '/autoload.php' );
@@ -288,12 +295,13 @@ class ScaffoldPluginCommand extends BaseCommand {
 			} catch ( RuntimeException $e ) {
 				$output->writeln( "<error>An error occurred</error>" );
 				$output->writeln( sprintf( "<error>%s</error>", $e->getMessage() ) );
-				exit;
+				return Command::FAILURE;
 			}
 
 			$io->success( 'Run composer dump-autoload to make the autoloading work :)' );
 		}
 		$io->success( 'Your plugin is ready ! :)' );
+		return Command::SUCCESS;
 	}
 
 	/**
