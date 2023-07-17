@@ -1,5 +1,8 @@
 # Changelog ##
 
+## 2.4.2 - 17 Jul 2023
+* Fix: ensure command return an int
+
 ## 2.4.1 - 01 Mar 2022
 * Support composer/installers ^2.0
 * Don't create empty `Admin` directory during plugin scaffolding
