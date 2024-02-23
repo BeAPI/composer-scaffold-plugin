@@ -1,5 +1,8 @@
 # Changelog ##
 
+## 2.4.3 - 23 Fev 2024
+* Fix: ensure path to namespace in autoload is always relative to the package root
+
 ## 2.4.2 - 17 Jul 2023
 * Fix: ensure command return an int
 
