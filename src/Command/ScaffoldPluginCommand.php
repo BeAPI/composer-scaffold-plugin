@@ -288,7 +288,7 @@ class ScaffoldPluginCommand extends BaseCommand {
 
 			try {
 				$composerJson                                                 = $composerFile->read();
-				$composerJson['autoload']['psr-4'][ $pluginNamespace . "\\" ] = rtrim( $installPath, '/' ) . '/classes/';
+				$composerJson['autoload']['psr-4'][ $pluginNamespace . "\\" ] = $this->makeAutoloadPath( $installPath, $composer ) . '/classes/';
 
 				$composerFile->write( $composerJson );
 				$output->writeln( "The namespace have been added to the composer.json file !" );
@@ -419,5 +419,26 @@ class ScaffoldPluginCommand extends BaseCommand {
 		$path = $composer->getInstallationManager()->getInstallPath( $plugin );
 
 		return \rtrim( $path, '/' ) . '/';
+	}
+
+	/**
+	 * Take the package installation path and prepare it for autoload mapping.
+	 *
+	 * Will take care of converting absolute path to relative one.
+	 *
+	 * @param string $path the package installation path.
+	 * @param Composer $composer the composer instance.
+	 *
+	 * @return string a relative path to the namespace directory which doesn't end with a slash.
+	 */
+	protected function makeAutoloadPath( $path, $composer ) {
+		// Make path relative to package's root.
+		if ( 0 === strpos( $path, '/' ) ) {
+			$composerJsonFilePath = $composer->getConfig()->getConfigSource()->getName();
+			$projectRootPath = dirname( $composerJsonFilePath );
+			$path = str_replace( $projectRootPath, '', $path );
+		}
+
+		return trim( $path, '/' );
 	}
 }
