@@ -163,6 +163,11 @@ class ScaffoldPluginCommand extends BaseCommand {
 				rename( $downloadPath . '/classes/Blocks/Block_Interface.php', $installPath . 'classes/Blocks/Block_Interface.php' );
 				rename( $downloadPath . '/classes/Blocks/Dynamic_Block.php', $installPath . 'classes/Blocks/Dynamic_Block.php' );
 				rename( $downloadPath . '/classes/Blocks/Dynamic_Block_Interface.php', $installPath . 'classes/Blocks/Dynamic_Block_Interface.php' );
+
+				// Since Boilerplate 3.5.0
+				if ( is_readable( $downloadPath . '/classes/Blocks/Acf_Json_Block.php' ) ) {
+					rename( $downloadPath . '/classes/Blocks/Acf_Json_Block.php', $installPath . 'classes/Blocks/Acf_Json_Block.php' );
+				}
 			}
 		}
 
