@@ -1,5 +1,8 @@
 # Changelog ##
 
+## 2.4.4 - 02 Jul 2024
+* Include new `Acf_Json_Block` file during plugin scaffolding
+
 ## 2.4.3 - 23 Fev 2024
 * Fix: ensure path to namespace in autoload is always relative to the package root
 
