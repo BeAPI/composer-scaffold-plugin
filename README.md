@@ -22,6 +22,16 @@ Then you can launch `composer scaffold-plugin [--boilerplate-version [BOILERPLAT
 
 ![List of arguments](screenshot.png)
 
+## Documentation (humans and agents)
+
+Full reference for **when** to pass each component and **what** each boilerplate class is for:
+
+- [docs/README.md](docs/README.md) — how the docs are organised
+- [docs/decision-guide.md](docs/decision-guide.md) — choose tokens from a spec
+- [docs/command.md](docs/command.md) — arguments, options, interactive prompts
+- [docs/components/](docs/components/) — one file per token (`route`, `controller`, `cron`, `model`, `widget`, `shortcode`) plus always-included classes
+- [AGENTS.md](AGENTS.md) — short rules for autonomous scaffolding
+
 # Who ?
 
 Created by [Be API](https://beapi.fr), the French WordPress leader agency since 2009. Based in Paris, we are more than 30 people and always [hiring](https://beapi.workable.com) some fun and talented guys. So we will be pleased to work with you.
